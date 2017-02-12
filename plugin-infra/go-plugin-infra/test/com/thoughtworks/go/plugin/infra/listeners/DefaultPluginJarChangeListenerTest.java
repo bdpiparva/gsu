@@ -16,13 +16,6 @@
 
 package com.thoughtworks.go.plugin.infra.listeners;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-
-import com.thoughtworks.go.util.OperatingSystem;
-import com.thoughtworks.go.util.SystemEnvironment;
 import com.thoughtworks.go.plugin.api.info.PluginDescriptorAware;
 import com.thoughtworks.go.plugin.infra.Action;
 import com.thoughtworks.go.plugin.infra.ExceptionHandler;
@@ -33,7 +26,7 @@ import com.thoughtworks.go.plugin.infra.plugininfo.DefaultPluginRegistry;
 import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginDescriptor;
 import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginDescriptorBuilder;
 import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginOSGiManifest;
-import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginOSGiManifestGenerator;
+import com.thoughtworks.go.util.SystemEnvironment;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
@@ -44,6 +37,11 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.osgi.framework.Bundle;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+
 import static com.thoughtworks.go.util.SystemEnvironment.PLUGIN_ACTIVATOR_JAR_PATH;
 import static com.thoughtworks.go.util.SystemEnvironment.PLUGIN_BUNDLE_PATH;
 import static java.util.Arrays.asList;
@@ -52,17 +50,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DefaultPluginJarChangeListenerTest {
     private static final String TEST_BUNDLES_DIR = "test-bundles-dir";
@@ -70,7 +58,7 @@ public class DefaultPluginJarChangeListenerTest {
     private File PLUGIN_DIR;
     private File BUNDLE_DIR;
     private DefaultPluginRegistry registry;
-    private GoPluginOSGiManifestGenerator osgiManifestGenerator;
+    private GoPluginOSGiManifest.DefaultGoPluginOSGiManifestCreator osgiManifestGenerator;
     private DefaultPluginJarChangeListener listener;
     private GoPluginOSGiFramework osgiFramework;
     private SystemEnvironment systemEnvironment;

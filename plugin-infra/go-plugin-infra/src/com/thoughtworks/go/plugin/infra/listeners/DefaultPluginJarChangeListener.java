@@ -16,30 +16,25 @@
 
 package com.thoughtworks.go.plugin.infra.listeners;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-
-import com.thoughtworks.go.util.OperatingSystem;
-import com.thoughtworks.go.util.SystemEnvironment;
-import com.thoughtworks.go.util.ZipUtil;
 import com.thoughtworks.go.plugin.api.info.PluginDescriptorAware;
 import com.thoughtworks.go.plugin.infra.Action;
 import com.thoughtworks.go.plugin.infra.ExceptionHandler;
 import com.thoughtworks.go.plugin.infra.GoPluginOSGiFramework;
 import com.thoughtworks.go.plugin.infra.monitor.PluginFileDetails;
 import com.thoughtworks.go.plugin.infra.monitor.PluginJarChangeListener;
-import com.thoughtworks.go.plugin.infra.plugininfo.DefaultPluginRegistry;
-import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginDescriptor;
-import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginDescriptorBuilder;
-import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginOSGiManifest;
-import com.thoughtworks.go.plugin.infra.plugininfo.GoPluginOSGiManifestGenerator;
+import com.thoughtworks.go.plugin.infra.plugininfo.*;
+import com.thoughtworks.go.util.SystemEnvironment;
+import com.thoughtworks.go.util.ZipUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.thoughtworks.go.util.SystemEnvironment.PLUGIN_ACTIVATOR_JAR_PATH;
 
