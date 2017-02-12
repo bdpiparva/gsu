@@ -19,13 +19,14 @@ package com.thoughtworks.go.server.security.providers;
 import com.thoughtworks.go.config.SecurityConfig;
 import com.thoughtworks.go.server.service.GoConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.ldap.LdapAuthoritiesPopulator;
+import org.springframework.security.ldap.authentication.LdapAuthenticator;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
-public class LdapAuthenticationProvider extends org.springframework.security.providers.ldap.LdapAuthenticationProvider {
+public class LdapAuthenticationProvider extends org.springframework.security.ldap.authentication.LdapAuthenticationProvider {
     private final GoConfigService goConfigService;
 
     @Autowired
-    public LdapAuthenticationProvider(GoConfigService goConfigService, org.springframework.security.providers.ldap.LdapAuthenticator authenticator, LdapAuthoritiesPopulator authoritiesPopulator) {
+    public LdapAuthenticationProvider(GoConfigService goConfigService, LdapAuthenticator authenticator, LdapAuthoritiesPopulator authoritiesPopulator) {
         super(authenticator, authoritiesPopulator);
         this.goConfigService = goConfigService;
     }

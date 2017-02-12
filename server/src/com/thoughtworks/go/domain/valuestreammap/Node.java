@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public abstract class Node implements Comparable<Node>{
+public abstract class Node implements Comparable<Node> {
     protected final String id;
     protected final String nodeName;
     private final List<Node> parents = new ArrayList<>();
@@ -37,7 +37,7 @@ public abstract class Node implements Comparable<Node>{
 
     public Node(DependencyNodeType dependencyNodeType, String nodeId, String nodeName) {
         this.id = nodeId;
-        this.type= dependencyNodeType;
+        this.type = dependencyNodeType;
         this.nodeName = nodeName;
     }
 
@@ -194,7 +194,7 @@ public abstract class Node implements Comparable<Node>{
         nodesInPath.add(getId());
         for (Node child : getChildren()) {
             if (!verifiedNodes.contains(child)) {
-                if(child.hasCycleInSubGraph(nodesInPath, verifiedNodes)) {
+                if (child.hasCycleInSubGraph(nodesInPath, verifiedNodes)) {
                     return true;
                 }
             }

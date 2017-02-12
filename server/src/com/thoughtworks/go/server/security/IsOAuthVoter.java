@@ -16,11 +16,13 @@
 
 package com.thoughtworks.go.server.security;
 
-import org.springframework.security.vote.AccessDecisionVoter;
-import org.springframework.security.ConfigAttribute;
-import org.springframework.security.Authentication;
-import org.springframework.security.ConfigAttributeDefinition;
-import org.springframework.security.SecurityConfig;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.core.Authentication;
+
+import java.util.Collection;
+
 import static com.thoughtworks.go.server.security.GoAuthority.ROLE_OAUTH_USER;
 
 /**
@@ -35,7 +37,7 @@ public class IsOAuthVoter implements AccessDecisionVoter {
         return true;
     }
 
-    public int vote(Authentication authentication, Object object, ConfigAttributeDefinition config) {
+    public int vote(Authentication authentication, Object object, Collection config) {
         if (authentication instanceof OauthAuthenticationToken) {
             if (!config.contains(new SecurityConfig(ROLE_OAUTH_USER.name()))) {
                 return ACCESS_DENIED;

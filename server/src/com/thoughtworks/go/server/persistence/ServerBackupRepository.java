@@ -16,9 +16,6 @@
 
 package com.thoughtworks.go.server.persistence;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import com.thoughtworks.go.server.domain.ServerBackup;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -26,9 +23,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.HibernateCallback;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ServerBackupRepository extends HibernateDaoSupport {
@@ -41,7 +40,7 @@ public class ServerBackupRepository extends HibernateDaoSupport {
 
     public ServerBackup lastBackup() {
         List results = (List) getHibernateTemplate().execute(new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException {
+            public Object doInHibernate(Session session) throws HibernateException {
                 Criteria criteria = session.createCriteria(ServerBackup.class);
                 criteria.setMaxResults(1);
                 criteria.addOrder(Order.desc("id"));
@@ -58,7 +57,7 @@ public class ServerBackupRepository extends HibernateDaoSupport {
 
     public void deleteAll() {
         getHibernateTemplate().execute(new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException {
+            public Object doInHibernate(Session session) throws HibernateException {
                 return session.createQuery(String.format("DELETE FROM %s", ServerBackup.class.getName())).executeUpdate();
             }
         });

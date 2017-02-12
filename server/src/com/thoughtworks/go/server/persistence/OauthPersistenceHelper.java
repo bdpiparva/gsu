@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.thoughtworks.go.server.domain.oauth.OauthDomainEntity;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * @understands

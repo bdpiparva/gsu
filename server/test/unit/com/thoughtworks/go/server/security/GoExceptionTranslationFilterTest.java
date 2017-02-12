@@ -16,19 +16,18 @@
 
 package com.thoughtworks.go.server.security;
 
-import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-
 import com.thoughtworks.go.server.service.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.ui.AuthenticationEntryPoint;
-import org.springframework.security.ui.basicauth.BasicProcessingFilterEntryPoint;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -57,10 +56,9 @@ public class GoExceptionTranslationFilterTest {
         cruiseLoginFormAuth = mock(AuthenticationEntryPoint.class);
         securityService = mock(SecurityService.class);
 
-        filter = new GoExceptionTranslationFilter();
-        filter.setUrlPatternsThatShouldNotBeRedirectedToAfterLogin("(\\.json)|(/images/)");
-        filter.setAuthenticationEntryPoint(cruiseLoginFormAuth);
+        filter = new GoExceptionTranslationFilter(cruiseLoginFormAuth);
         filter.setBasicAuthenticationEntryPoint(basicAuth);
+        filter.setUrlPatternsThatShouldNotBeRedirectedToAfterLogin("(\\.json)|(/images/)");
         filter.setSecurityService(securityService);
     }
 

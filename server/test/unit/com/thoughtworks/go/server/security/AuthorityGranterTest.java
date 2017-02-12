@@ -17,14 +17,15 @@
 package com.thoughtworks.go.server.security;
 
 import com.thoughtworks.go.config.CaseInsensitiveString;
-import com.thoughtworks.go.server.service.SecurityService;
 import com.thoughtworks.go.server.domain.Username;
+import com.thoughtworks.go.server.service.SecurityService;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.security.core.GrantedAuthority;
+
 import static org.hamcrest.collection.IsArrayContaining.hasItemInArray;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.security.GrantedAuthority;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

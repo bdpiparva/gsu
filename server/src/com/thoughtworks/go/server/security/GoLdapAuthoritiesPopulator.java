@@ -18,8 +18,12 @@ package com.thoughtworks.go.server.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.ldap.LdapAuthoritiesPopulator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 public class GoLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
     private final AuthorityGranter authorityGranter;
@@ -29,8 +33,8 @@ public class GoLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
         this.authorityGranter = authorityGranter;
     }
 
-    public GrantedAuthority[] getGrantedAuthorities(DirContextOperations userData, String username) {
+    public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
         GrantedAuthority[] authorities = authorityGranter.authorities(username);
-        return authorities == null ? new GrantedAuthority[0] : authorities;
+        return authorities == null ? Collections.emptyList() : Arrays.asList(authorities);
     }
 }

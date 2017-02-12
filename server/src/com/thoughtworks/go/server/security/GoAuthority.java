@@ -16,8 +16,8 @@
 
 package com.thoughtworks.go.server.security;
 
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public enum GoAuthority {
     ROLE_SUPERVISOR,
@@ -28,7 +28,7 @@ public enum GoAuthority {
     ROLE_TEMPLATE_SUPERVISOR;
 
     public GrantedAuthority asAuthority() {
-        return new GrantedAuthorityImpl(this.toString());
+        return new SimpleGrantedAuthority(this.toString());
     }
 
 }

@@ -16,27 +16,27 @@
 
 package com.thoughtworks.go.server.security;
 
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.ui.SpringSecurityFilter;
-import org.springframework.security.ui.FilterChainOrder;
+public class OauthAuthenticationFilter extends org.springframework.security.web.authentication.www.BasicAuthenticationFilter {
 
-public class OauthAuthenticationFilter extends SpringSecurityFilter {
     private final AuthenticationManager authenticationManager;
     private static final Pattern OAUTH_TOKEN_PATTERN = Pattern.compile("^Token token=\"(.*?)\"$");
     static final String AUTHORIZATION = "Authorization";
 
     public OauthAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super(authenticationManager);
         this.authenticationManager = authenticationManager;
     }
 
@@ -63,9 +63,5 @@ public class OauthAuthenticationFilter extends SpringSecurityFilter {
             }
         }
         chain.doFilter(request, response);
-    }
-
-    public int getOrder() {
-        return FilterChainOrder.BASIC_PROCESSING_FILTER - 1;
     }
 }

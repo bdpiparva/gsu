@@ -16,17 +16,19 @@
 
 package com.thoughtworks.go.server.database;
 
-import java.util.Properties;
-
 import com.thoughtworks.go.database.Database;
+import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Properties;
 
 public class HibernateProperties extends Properties {
     @Autowired
     public HibernateProperties(Database database) {
-        super.put("hibernate.dialect", database.dialectForHibernate());
-        super.put("hibernate.cache.provider_class", "org.hibernate.cache.EhCacheProvider");
-        super.put("hibernate.cache.use_query_cache", "true");
-        super.put("hibernate.show_sql", "false");
+//        super.put("hibernate.cache.provider_class", "net.sf.ehcache.hibernate.SingletonEhCacheProvider");
+        super.put(AvailableSettings.DIALECT, database.dialectForHibernate());
+        super.put(AvailableSettings.USE_QUERY_CACHE, "true");
+        super.put(AvailableSettings.SHOW_SQL, "false");
+        super.put(AvailableSettings.CACHE_REGION_FACTORY, org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory.class.getCanonicalName());
     }
 }

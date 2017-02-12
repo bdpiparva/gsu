@@ -16,14 +16,15 @@
 
 package com.thoughtworks.go.server.security;
 
-import org.springframework.security.providers.AbstractAuthenticationToken;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public class OauthAuthenticationToken extends AbstractAuthenticationToken {
     private final String token;
     private UserDetails userDetails;
 
     public OauthAuthenticationToken(String token) {
+        super(null);
         this.token = token;
     }
 

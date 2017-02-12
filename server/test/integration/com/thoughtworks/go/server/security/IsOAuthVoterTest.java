@@ -16,18 +16,19 @@
 
 package com.thoughtworks.go.server.security;
 
+import org.junit.Test;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-import static org.junit.Assert.assertThat;
-import org.springframework.security.SecurityConfig;
-import org.springframework.security.ConfigAttribute;
-import org.springframework.security.ConfigAttributeDefinition;
-import org.springframework.security.providers.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.security.vote.AuthenticatedVoter;
-import org.springframework.security.vote.AccessDecisionVoter;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class IsOAuthVoterTest {
 
@@ -48,19 +49,19 @@ public class IsOAuthVoterTest {
     @Test
     public void shouldDenyWhenOAuthTokenUserIsAccessingNonOAuthURLs() {
         IsOAuthVoter voter = new IsOAuthVoter();
-        assertThat(voter.vote(new OauthAuthenticationToken("token"), new Object(), new ConfigAttributeDefinition(withoutOAuth())), is(AccessDecisionVoter.ACCESS_DENIED));
+        assertThat(voter.vote(new OauthAuthenticationToken("token"), new Object(), new ArrayList(withoutOAuth())), is(AccessDecisionVoter.ACCESS_DENIED));
     }
 
     @Test
     public void shouldGrantWhenOAuthTokenUserIsAccessingOAuthURLs() {
         IsOAuthVoter voter = new IsOAuthVoter();
-        assertThat(voter.vote(new OauthAuthenticationToken("token"), new Object(), new ConfigAttributeDefinition(withOAuth())), is(AccessDecisionVoter.ACCESS_GRANTED));
+        assertThat(voter.vote(new OauthAuthenticationToken("token"), new Object(), new ArrayList(withOAuth())), is(AccessDecisionVoter.ACCESS_GRANTED));
     }
 
     @Test
     public void shouldAbstainWhenAuthenticationIsNotOAuthToken() {
         IsOAuthVoter voter = new IsOAuthVoter();
-        assertThat(voter.vote(new PreAuthenticatedAuthenticationToken(new Object(), new Object()), new Object(), new ConfigAttributeDefinition(withOAuth())), is(AccessDecisionVoter.ACCESS_ABSTAIN));
+        assertThat(voter.vote(new PreAuthenticatedAuthenticationToken(new Object(), new Object()), new Object(), new ArrayList(withOAuth())), is(AccessDecisionVoter.ACCESS_ABSTAIN));
     }
 
     private List<ConfigAttribute> withOAuth() {

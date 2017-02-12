@@ -16,18 +16,21 @@
 
 package com.thoughtworks.go.server.security.providers;
 
+import com.thoughtworks.go.server.oauth.OauthDataSource;
 import com.thoughtworks.go.server.security.GoAuthority;
 import com.thoughtworks.go.server.security.OauthAuthenticationToken;
-import com.thoughtworks.go.server.oauth.OauthDataSource;
-import org.springframework.security.providers.AuthenticationProvider;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class OauthAuthenticationProvider implements AuthenticationProvider {
@@ -51,8 +54,8 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
         return new OauthAuthenticationToken(user);
     }
 
-    private GrantedAuthority[] oauthAuthority() {
-        return new GrantedAuthority[] { GoAuthority.ROLE_OAUTH_USER.asAuthority() };
+    private List<GrantedAuthority> oauthAuthority() {
+        return Arrays.asList(new GrantedAuthority[]{GoAuthority.ROLE_OAUTH_USER.asAuthority()});
     }
 
     public boolean supports(Class authentication) {

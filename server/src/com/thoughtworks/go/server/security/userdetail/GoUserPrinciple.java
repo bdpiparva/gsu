@@ -16,8 +16,10 @@
 
 package com.thoughtworks.go.server.security.userdetail;
 
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+
+import java.util.Arrays;
 
 /**
  * @understands a user principle in Go
@@ -29,7 +31,7 @@ public class GoUserPrinciple extends User {
     public GoUserPrinciple(String username, String displayName, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
                            GrantedAuthority[] authorities)
             throws IllegalArgumentException {
-        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, Arrays.asList(authorities));
         this.displayName = displayName;
     }
 

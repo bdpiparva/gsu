@@ -17,11 +17,7 @@
 package com.thoughtworks.go.server.database;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-
-import static com.thoughtworks.go.util.ArrayUtil.addToArray;
-import static com.thoughtworks.go.util.StringUtil.isBlank;
 
 public class SqlMapClientFactory extends org.springframework.orm.ibatis.SqlMapClientFactoryBean {
 
@@ -34,23 +30,7 @@ public class SqlMapClientFactory extends org.springframework.orm.ibatis.SqlMapCl
 
     @Override
     public void setConfigLocation(Resource configLocation) {
-        if (configLocation != null) {
-            this.setConfigLocations(new Resource[]{configLocation});
-        } else {
-            super.setConfigLocation(configLocation);
-        }
-    }
-
-    @Override
-    public void setConfigLocations(Resource[] configLocations) {
-        super.setConfigLocations(addToConfigLocations(configLocations, databaseStrategy.getIbatisConfigXmlLocation()));
-    }
-
-    private Resource[] addToConfigLocations(Resource[] configLocations, String ibatisConfigXmlLocation) {
-        if (isBlank(ibatisConfigXmlLocation)) {
-            return configLocations;
-        }
-        return addToArray(configLocations, new ClassPathResource(ibatisConfigXmlLocation));
+        super.setConfigLocation(configLocation);
     }
 
     @Override

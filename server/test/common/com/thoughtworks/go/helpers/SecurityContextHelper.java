@@ -16,23 +16,26 @@
 
 package com.thoughtworks.go.helpers;
 
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.context.SecurityContextImpl;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.userdetails.User;
-import org.springframework.security.GrantedAuthority;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.User;
+
+import java.util.ArrayList;
 
 /**
  * @understands
  */
 public class SecurityContextHelper {
-    public static void  setCurrentUser(String username) {
-        setCurrentUserWithAuthorities(username, new GrantedAuthority[]{});
+    public static void setCurrentUser(String username) {
+        setCurrentUserWithAuthorities(username, new ArrayList<GrantedAuthority>());
     }
 
-    public static void setCurrentUserWithAuthorities(String username, final GrantedAuthority[] authorities) {
+    public static void setCurrentUserWithAuthorities(String username, final ArrayList<GrantedAuthority> authorities) {
         SecurityContextImpl context = new SecurityContextImpl();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(new User(username, "", true, authorities), null, authorities));
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(new User(username, "", authorities), null, authorities));
         SecurityContextHolder.setContext(context);
     }
 }

@@ -18,10 +18,11 @@ package com.thoughtworks.go.server.security;
 
 import com.thoughtworks.go.server.service.GoConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.Authentication;
-import org.springframework.security.ConfigAttribute;
-import org.springframework.security.ConfigAttributeDefinition;
-import org.springframework.security.vote.AccessDecisionVoter;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.core.Authentication;
+
+import java.util.Collection;
 
 public class IsSecurityEnabledVoter implements AccessDecisionVoter {
     private GoConfigService goConfigService;
@@ -35,11 +36,14 @@ public class IsSecurityEnabledVoter implements AccessDecisionVoter {
         return true;
     }
 
+    @Override
+    public int vote(Authentication authentication, Object object, Collection collection) {
+        return goConfigService.isSecurityEnabled() ? ACCESS_ABSTAIN : ACCESS_GRANTED;
+    }
+
     public boolean supports(Class aClass) {
         return true;
     }
 
-    public int vote(Authentication authentication, Object o, ConfigAttributeDefinition configAttributeDefinition) {
-        return goConfigService.isSecurityEnabled() ? ACCESS_ABSTAIN : ACCESS_GRANTED;
-    }
+
 }

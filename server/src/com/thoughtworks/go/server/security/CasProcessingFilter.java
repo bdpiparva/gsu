@@ -16,21 +16,26 @@
 
 package com.thoughtworks.go.server.security;
 
-import java.io.IOException;
+import org.springframework.security.cas.web.CasAuthenticationFilter;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.WebAttributes;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
+public class CasProcessingFilter extends CasAuthenticationFilter {
 
-public class CasProcessingFilter extends  org.springframework.security.ui.cas.CasProcessingFilter {
-    @Override protected void onUnsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         SecurityContext context = SecurityContextHolder.getContext();
-        request.getSession().setAttribute(SPRING_SECURITY_LAST_EXCEPTION_KEY, new OnlyKnownUsersAllowedException("Foo"));
+        request.getSession().setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, new OnlyKnownUsersAllowedException("Foo"));
         request.setAttribute(SessionDenialAwareAuthenticationProcessingFilterEntryPoint.SESSION_DENIED, true);
         context.setAuthentication(null);
         response.sendRedirect("/go/auth/login");
-        super.onUnsuccessfulAuthentication(request, response, failed);
+        super.unsuccessfulAuthentication(request, response, failed);
     }
 }

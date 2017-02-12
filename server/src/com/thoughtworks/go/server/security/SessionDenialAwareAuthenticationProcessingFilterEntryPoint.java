@@ -16,27 +16,32 @@
 
 package com.thoughtworks.go.server.security;
 
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.util.Assert;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint;
-import org.springframework.security.AuthenticationException;
-import org.springframework.util.Assert;
 
 /**
  * @understands the new unauthenticated sessions and denied sessions
  */
-public class SessionDenialAwareAuthenticationProcessingFilterEntryPoint extends AuthenticationProcessingFilterEntryPoint {
-    public static final String SESSION_DENIED = "session_denied";
+public class SessionDenialAwareAuthenticationProcessingFilterEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
+    public static final String SESSION_DENIED = "session_denied";
     private String deniedSessionLoginFormUrl;
+
+    public SessionDenialAwareAuthenticationProcessingFilterEntryPoint(String loginFormUrl) {
+        super(loginFormUrl);
+    }
 
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         Assert.hasLength(deniedSessionLoginFormUrl, "deniedSessionLoginFormUrl must be specified");
     }
 
-    @Override protected String determineUrlToUseForThisRequest(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
+    @Override
+    protected String determineUrlToUseForThisRequest(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
         Object hasSessionBeenDenied = request.getAttribute(SESSION_DENIED);
         return (hasSessionBeenDenied != null && (Boolean) hasSessionBeenDenied) ? deniedSessionLoginFormUrl : super.determineUrlToUseForThisRequest(request, response, exception);
     }

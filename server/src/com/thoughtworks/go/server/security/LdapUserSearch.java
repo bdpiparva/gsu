@@ -16,15 +16,6 @@
 
 package com.thoughtworks.go.server.security;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttributes;
-import javax.naming.directory.SearchControls;
-
 import com.thoughtworks.go.config.LdapConfig;
 import com.thoughtworks.go.config.SecurityConfig;
 import com.thoughtworks.go.config.server.security.ldap.BaseConfig;
@@ -32,24 +23,29 @@ import com.thoughtworks.go.domain.User;
 import com.thoughtworks.go.server.service.GoConfigService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.AttributesMapperCallbackHandler;
-import org.springframework.ldap.core.ContextSource;
-import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.*;
+import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.ldap.filter.LikeFilter;
 import org.springframework.ldap.filter.OrFilter;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.ldap.SpringSecurityContextSource;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.SearchControls;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
-public class LdapUserSearch implements org.springframework.security.ldap.LdapUserSearch {
+public class LdapUserSearch implements org.springframework.security.ldap.search.LdapUserSearch {
     private final GoConfigService goConfigService;
     private final Logger logger;
-    private final SpringSecurityContextSource contextFactory;
+    private final BaseLdapPathContextSource contextFactory;
     private static final String SAM_ACCOUNT_NAME = "sAMAccountName";
     private static final String UID = "uid";
     private static final String COMMON_NAME = "cn";
@@ -59,7 +55,6 @@ public class LdapUserSearch implements org.springframework.security.ldap.LdapUse
     private static final long MAX_RESULTS = 100;
     private LdapTemplate ldapTemplate;
 
-
     @Autowired
     public LdapUserSearch(GoConfigService goConfigService, ContextSource contextFactory) {
         this(goConfigService, contextFactory, new LdapTemplate(contextFactory), Logger.getLogger(LdapUserSearch.class));
@@ -68,7 +63,7 @@ public class LdapUserSearch implements org.springframework.security.ldap.LdapUse
     public LdapUserSearch(GoConfigService goConfigService, ContextSource contextFactory, final LdapTemplate ldapTemplate, Logger logger) {
         this.goConfigService = goConfigService;
         this.logger = logger;
-        this.contextFactory = (SpringSecurityContextSource) contextFactory;
+        this.contextFactory = (BaseLdapPathContextSource) contextFactory;
         this.ldapTemplate = ldapTemplate;
     }
 
@@ -82,8 +77,8 @@ public class LdapUserSearch implements org.springframework.security.ldap.LdapUse
         RuntimeException lastFoundException = null;
         BaseConfig failedBaseConfig = null;
         for (BaseConfig baseConfig : ldapConfig.getBasesConfig()) {
-            if(lastFoundException != null && !(lastFoundException instanceof BadCredentialsException)) {
-                logger.warn(String.format("The ldap configuration for search base '%s' is invalid", failedBaseConfig.getValue()),lastFoundException);
+            if (lastFoundException != null && !(lastFoundException instanceof BadCredentialsException)) {
+                logger.warn(String.format("The ldap configuration for search base '%s' is invalid", failedBaseConfig.getValue()), lastFoundException);
             }
             FilterBasedLdapUserSearch search = getFilterBasedLdapUserSearch(baseConfig.getValue(), ldapConfig.searchFilter());
             search.setSearchSubtree(true);
@@ -98,7 +93,7 @@ public class LdapUserSearch implements org.springframework.security.ldap.LdapUse
                 lastFoundException = e;
             }
         }
-        if(lastFoundException != null) {
+        if (lastFoundException != null) {
             throw lastFoundException;
 
         }
@@ -111,7 +106,7 @@ public class LdapUserSearch implements org.springframework.security.ldap.LdapUse
     }
 
     public List<User> search(String username, LdapConfig ldapConfig) {
-        if(ldapConfig.getBasesConfig().isEmpty()) {
+        if (ldapConfig.getBasesConfig().isEmpty()) {
             throw new RuntimeException("Atleast one Search Base needs to be configured.");
         }
         OrFilter filter = new OrFilter();
@@ -168,7 +163,7 @@ public class LdapUserSearch implements org.springframework.security.ldap.LdapUse
 
         Attribute emailAttr = attributes.get(USER_PRINCIPLE_NAME);
         String emailAddress = emailAttr != null ? emailAttr.get().toString() : "";
-        if(emailAddress.equals("")){
+        if (emailAddress.equals("")) {
             emailAttr = attributes.get(MAIL_ID);
             emailAddress = emailAttr != null ? emailAttr.get().toString() : "";
         }

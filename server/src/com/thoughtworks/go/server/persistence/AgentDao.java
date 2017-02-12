@@ -16,24 +16,22 @@
 
 package com.thoughtworks.go.server.persistence;
 
-import java.sql.SQLException;
-
 import com.thoughtworks.go.remote.AgentIdentifier;
 import com.thoughtworks.go.server.cache.GoCache;
 import com.thoughtworks.go.server.domain.AgentCookie;
-import com.thoughtworks.go.server.transaction.TransactionTemplate;
 import com.thoughtworks.go.server.transaction.TransactionSynchronizationManager;
-import org.hibernate.Query;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
+import com.thoughtworks.go.server.transaction.TransactionTemplate;
 import org.hibernate.HibernateException;
+import org.hibernate.query.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateCallback;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.TransactionStatus;
 
 /**
  * @understands persisting and retrieving agent uuid-cookie mapping
@@ -95,7 +93,7 @@ public class AgentDao extends HibernateDaoSupport {
 
     private AgentCookie findAgentCookieByUuid(final AgentIdentifier agentIdentifier) {
         return (AgentCookie) getHibernateTemplate().execute(new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException {
+            public Object doInHibernate(Session session) throws HibernateException {
                 Query query = session.createQuery("from AgentCookie where uuid = :uuid");
                 query.setString("uuid", agentIdentifier.getUuid());
                 return query.uniqueResult();

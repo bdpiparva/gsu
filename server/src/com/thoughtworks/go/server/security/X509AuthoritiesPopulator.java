@@ -16,33 +16,31 @@
 
 package com.thoughtworks.go.server.security;
 
-import java.security.cert.X509Certificate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.security.auth.x500.X500Principal;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.SpringSecurityMessageSource;
-import org.springframework.security.userdetails.User;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.SpringSecurityMessageSource;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
-public class X509AuthoritiesPopulator implements org.springframework.security.providers.x509.X509AuthoritiesPopulator,
-                                                 InitializingBean, MessageSourceAware {
+import javax.security.auth.x500.X500Principal;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class X509AuthoritiesPopulator implements com.thoughtworks.go.server.security.x509.X509AuthoritiesPopulator, InitializingBean, MessageSourceAware {
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
     private static final Pattern CN_PATTERN = Pattern.compile("CN=([^,]*)");
     private static final Pattern OU_PATTERN = Pattern.compile("OU=([^,]*)");
     public static final String ROLE_AGENT = "ROLE_AGENT";
     public static String ROLE_SHINE = "ROLE_SHINE";
-
     private String role;
 
     public X509AuthoritiesPopulator(String role) {
@@ -58,8 +56,8 @@ public class X509AuthoritiesPopulator implements org.springframework.security.pr
         Matcher cnMatcher = CN_PATTERN.matcher(principal.getName());
         Matcher ouMatcher = OU_PATTERN.matcher(principal.getName());
         if (cnMatcher.find() && ouMatcher.find()) {
-            GrantedAuthorityImpl agentAuthority = new GrantedAuthorityImpl(role);
-            return new User(cnMatcher.group(1), "", true, true, true, true, new GrantedAuthority[]{agentAuthority});
+            SimpleGrantedAuthority agentAuthority = new SimpleGrantedAuthority(role);
+            return new User(cnMatcher.group(1), "", true, true, true, true, Collections.singletonList(agentAuthority));
         }
         throw new BadCredentialsException("Couldn't find CN and/or OU for the certificate");
     }

@@ -16,82 +16,67 @@
 
 package com.thoughtworks.go.server.security;
 
-import static org.junit.Assert.assertTrue;
+import com.thoughtworks.go.server.service.GoConfigService;
+import com.thoughtworks.go.util.ClassMockery;
+import org.jmock.Expectations;
+import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import java.util.ArrayList;
 
-import com.thoughtworks.go.server.service.GoConfigService;
-import com.thoughtworks.go.util.ClassMockery;
 import static org.hamcrest.core.Is.is;
-
-import org.jmock.Expectations;
 import static org.junit.Assert.assertThat;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.security.Authentication;
-import org.springframework.security.ui.WebAuthenticationDetails;
-import org.springframework.security.userdetails.memory.UserAttribute;
+import static org.junit.Assert.assertTrue;
 
 public class AnonymousProcessingFilterTest {
-    private AnonymousProcessingFilter filter;
     private ClassMockery context = new ClassMockery();
     private GoConfigService goConfigService = context.mock(GoConfigService.class);
 
-    @Before
-    public void setUp() {
-        filter = new AnonymousProcessingFilter(goConfigService);
-        filter.setKey("anonymousKey");
-        UserAttribute userAttribute = createUserAttribute();
-        filter.setUserAttribute(userAttribute);
-    }
-
-    private UserAttribute createUserAttribute() {
-        UserAttribute userAttribute = new UserAttribute();
-        userAttribute.setAuthoritiesAsString(new ArrayList<String>() {
-            {
-                add("ROLE_ASSHOLE");
-            }
-        });
-        userAttribute.setPassword("anonymousPassword");
-        return userAttribute;
-    }
-
     @Test
     public void shouldGiveAnonymousUserRoleAnonymousAuthorityWhenSecurityIsONInCruiseConfig() throws Exception {
-        context.checking(new Expectations() {
-            {
-                allowing(goConfigService).isSecurityEnabled();
-                will(returnValue(true));
-            }
-        });
+        setExpectations(true);
+        AnonymousProcessingFilter filter = new AnonymousProcessingFilter(goConfigService);
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+
         Authentication authentication = filter.createAuthentication(mockHttpServletRequest);
-        assertThat(authentication.getAuthorities().length, is(1));
-        final String role = authentication.getAuthorities()[0].getAuthority();
+
+        assertThat(authentication.getAuthorities().size(), is(1));
+        final String role = new ArrayList<GrantedAuthority>(authentication.getAuthorities()).get(0).getAuthority();
         assertThat(role, is(GoAuthority.ROLE_ANONYMOUS.toString()));
     }
 
     @Test
     public void shouldGiveAnonymousUserRoleSupervisorAuthorityWhenSecurityIsOFFInCruiseConfig() throws Exception {
-        context.checking(new Expectations() {
-            {
-                allowing(goConfigService).isSecurityEnabled();
-                will(returnValue(false));
-            }
-        });
+        setExpectations(false);
+        AnonymousProcessingFilter filter = new AnonymousProcessingFilter(goConfigService);
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+
         Authentication authentication = filter.createAuthentication(mockHttpServletRequest);
-        assertThat(authentication.getAuthorities().length, is(1));
-        final String role = authentication.getAuthorities()[0].getAuthority();
+
+        assertThat(authentication.getAuthorities().size(), is(1));
+        final String role = new ArrayList<GrantedAuthority>(authentication.getAuthorities()).get(0).getAuthority();
         assertThat(role, is(GoAuthority.ROLE_SUPERVISOR.toString()));
         assertTrue(authentication.getDetails() instanceof WebAuthenticationDetails);
     }
 
     @Test
     public void shouldInitialiseKeyAndAuthoritiesByDefault() throws Exception {
-        AnonymousProcessingFilter testFilter = new AnonymousProcessingFilter(null);
-        assertThat(testFilter.getKey(), is("anonymousKey"));
-        assertThat(testFilter.getUserAttribute().getPassword(), is("anonymousUser"));
+        setExpectations(true);
+
+        AnonymousProcessingFilter testFilter = new AnonymousProcessingFilter(goConfigService);
+        assertThat(testFilter.getPrincipal(), is("anonymousUser"));
+        assertThat(testFilter.getAuthorities().get(0).getAuthority(), is("ROLE_ANONYMOUS"));
+    }
+
+    private void setExpectations(final boolean isSecurityEnabled) {
+        context.checking(new Expectations() {
+            {
+                allowing(goConfigService).isSecurityEnabled();
+                will(returnValue(isSecurityEnabled));
+            }
+        });
     }
 }

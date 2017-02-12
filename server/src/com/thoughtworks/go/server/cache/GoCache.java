@@ -22,7 +22,7 @@ import com.thoughtworks.go.server.transaction.TransactionSynchronizationManager;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.statistics.LiveCacheStatistics;
+import net.sf.ehcache.statistics.StatisticsGateway;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
@@ -247,8 +247,8 @@ public class GoCache {
         }
     }
 
-    public LiveCacheStatistics statistics() {
-        return ehCache.getLiveCacheStatistics();
+    public StatisticsGateway statistics() {
+        return ehCache.getStatistics();
     }
 
     public CacheConfiguration configuration() {

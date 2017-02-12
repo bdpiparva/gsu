@@ -32,9 +32,9 @@ import com.thoughtworks.go.server.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.providers.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.util.Map;
 
@@ -98,10 +98,10 @@ public class AuthenticationRequestProcessorTest {
         GoUserPrinciple goUserPrincipal = processorSpy.getGoUserPrincipal(user);
         assertThat(goUserPrincipal.getUsername(), is("username"));
         assertThat(goUserPrincipal.getDisplayName(), is("display name"));
-        verifyGrantAuthorities(goUserPrincipal.getAuthorities());
+        verifyGrantAuthorities(goUserPrincipal.getAuthorities().toArray(new GrantedAuthority[0]));
         PreAuthenticatedAuthenticationToken authenticationToken = processorSpy.getAuthenticationToken(goUserPrincipal);
         assertThat((GoUserPrinciple) authenticationToken.getPrincipal(), is(goUserPrincipal));
-        verifyGrantAuthorities(authenticationToken.getAuthorities());
+        verifyGrantAuthorities(authenticationToken.getAuthorities().toArray(new GrantedAuthority[0]));
         verify(securityContext).setAuthentication(authenticationToken);
     }
 

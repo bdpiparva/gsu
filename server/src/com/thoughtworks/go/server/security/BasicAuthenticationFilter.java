@@ -20,8 +20,9 @@ import com.thoughtworks.go.i18n.Localizer;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.ui.AbstractProcessingFilter;
-import org.springframework.security.ui.basicauth.BasicProcessingFilter;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.WebAttributes;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -31,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-public class BasicAuthenticationFilter extends BasicProcessingFilter {
+public class BasicAuthenticationFilter extends org.springframework.security.web.authentication.www.BasicAuthenticationFilter {
 
     private static ThreadLocal<Boolean> isProcessingBasicAuth = new ThreadLocal<Boolean>() {
         @Override
@@ -40,22 +41,23 @@ public class BasicAuthenticationFilter extends BasicProcessingFilter {
         }
     };
     private static final Logger LOG = Logger.getLogger(BasicAuthenticationFilter.class);
-    private Localizer localizer;
+    private final Localizer localizer;
 
     @Autowired
-    public BasicAuthenticationFilter(Localizer localizer) {
+    public BasicAuthenticationFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint, Localizer localizer) {
+        super(authenticationManager, authenticationEntryPoint);
         this.localizer = localizer;
     }
 
     @Override
-    public void doFilterHttp(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         try {
             isProcessingBasicAuth.set(true);
-            super.doFilterHttp(httpRequest, httpResponse, chain);
+            super.doFilterInternal(request, response, chain);
         } catch (Exception e) {
             LOG.error(e.toString()); // NPE and others do not have messages, their types are important too
             LOG.debug(e.getMessage(), e);
-            handleException(httpRequest, httpResponse, e);
+            handleException(request, response, e);
         } finally {
             isProcessingBasicAuth.set(false);
         }
@@ -64,7 +66,7 @@ public class BasicAuthenticationFilter extends BasicProcessingFilter {
     public void handleException(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Exception e) throws IOException {
         String message = localizer.localize("INVALID_LDAP_ERROR");
         if (hasAccept(httpRequest, "text/html") || hasAccept(httpRequest, "application/xhtml")) {
-            httpRequest.getSession().setAttribute(AbstractProcessingFilter.SPRING_SECURITY_LAST_EXCEPTION_KEY, new RuntimeException(message));
+            httpRequest.getSession().setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, new RuntimeException(message));
             httpRequest.setAttribute(SessionDenialAwareAuthenticationProcessingFilterEntryPoint.SESSION_DENIED, true);
 
             httpResponse.sendRedirect("/go/auth/login?login_error=1");

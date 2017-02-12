@@ -16,19 +16,21 @@
 
 package com.thoughtworks.go.server.security;
 
+import com.thoughtworks.go.security.X509CertificateGenerator;
 import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.thoughtworks.go.security.X509CertificateGenerator;
-import static com.thoughtworks.go.server.security.X509AuthoritiesPopulator.*;
+import static com.thoughtworks.go.server.security.X509AuthoritiesPopulator.ROLE_AGENT;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.junit.Test;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.userdetails.UserDetails;
 
 public class X509AuthoritiesPopulatorTest {
     private final X509AuthoritiesPopulator populator = new X509AuthoritiesPopulator(ROLE_AGENT);
@@ -49,10 +51,10 @@ public class X509AuthoritiesPopulatorTest {
         X509Certificate agentCertificate = new X509CertificateGenerator().createCertificateWithDn(
                 "CN=hostname, OU=agent").getFirstCertificate();
         UserDetails userDetails = populator.getUserDetails(agentCertificate);
-        GrantedAuthority[] actual = userDetails.getAuthorities();
-        GrantedAuthority expected = new GrantedAuthorityImpl(ROLE_AGENT);
-        assertThat(actual.length, is(1));
-        assertThat(actual[0], is(expected));
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(userDetails.getAuthorities());
+        GrantedAuthority expected = new SimpleGrantedAuthority(ROLE_AGENT);
+        assertThat(grantedAuthorities.size(), is(1));
+        assertThat(grantedAuthorities.get(0), is(expected));
     }
 
 }

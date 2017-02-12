@@ -16,14 +16,6 @@
 
 package com.thoughtworks.go.server.database;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import javax.sql.DataSource;
-
 import com.thoughtworks.go.database.Database;
 import com.thoughtworks.go.database.QueryExtensions;
 import com.thoughtworks.go.server.util.H2EventListener;
@@ -31,6 +23,14 @@ import com.thoughtworks.go.util.SystemEnvironment;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 import org.h2.tools.Server;
+
+import javax.sql.DataSource;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 
 import static com.thoughtworks.go.server.util.SqlUtil.joinWithQuotesForSql;
 import static com.thoughtworks.go.util.ExceptionUtils.bomb;

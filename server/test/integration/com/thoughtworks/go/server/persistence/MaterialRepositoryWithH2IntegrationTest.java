@@ -16,8 +16,6 @@
 
 package com.thoughtworks.go.server.persistence;
 
-import java.sql.SQLException;
-
 import com.googlecode.junit.ext.RunIf;
 import com.thoughtworks.go.config.materials.AbstractMaterial;
 import com.thoughtworks.go.config.materials.mercurial.HgMaterial;
@@ -34,9 +32,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.context.ContextConfiguration;
+
+import java.sql.SQLException;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsString;
@@ -51,10 +51,12 @@ import static org.junit.Assert.fail;
         "classpath:WEB-INF/applicationContext-acegi-security.xml"
 })
 public class MaterialRepositoryWithH2IntegrationTest {
-    @Autowired MaterialRepository repo;
+    @Autowired
+    MaterialRepository repo;
     @Autowired
     GoCache goCache;
-    @Autowired DatabaseAccessHelper dbHelper;
+    @Autowired
+    DatabaseAccessHelper dbHelper;
     private HibernateTemplate originalTemplate;
 
     @Before
@@ -74,14 +76,14 @@ public class MaterialRepositoryWithH2IntegrationTest {
     @RunIf(value = DatabaseChecker.class, arguments = {DatabaseChecker.H2})
     public void materialFingerprintShouldUseTheHashAlgoritmInMigration47() throws Exception {
         final HgMaterial material = new HgMaterial("url", null);
-        byte[] fingerprint = (byte[]) repo.getHibernateTemplate().execute(new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException {
+        byte[] fingerprint = (byte[]) repo.getHibernateTemplate().execute(new HibernateCallback<byte[]>() {
+            public byte[] doInHibernate(Session session) throws HibernateException {
                 String pattern = format("'type=%s%surl=%s'", material.getType(), AbstractMaterial.FINGERPRINT_DELIMITER, material.getUrl());
                 SQLQuery query = session.createSQLQuery(format("CALL HASH('SHA256', STRINGTOUTF8(%s), 1)", pattern));
-                return query.uniqueResult();
+                return (byte[]) query.uniqueResult();
             }
         });
-        assertThat(Hex.encodeHexString(fingerprint), is(material.getFingerprint()));
+        assertThat(Hex.encodeHex(fingerprint), is(material.getFingerprint()));
     }
 
     @Test
@@ -91,8 +93,7 @@ public class MaterialRepositoryWithH2IntegrationTest {
             dbHelper.execute("INSERT into Materials(type, flyweightName, fingerprint) VALUES ('DependencyMaterial', 'bar', 'foo')");
             dbHelper.execute("INSERT into Materials(type, flyweightName, fingerprint) VALUES ('SvnMaterial', 'baz', 'foo')");
             fail("should have failed");
-        }
-        catch (SQLException passed) {
+        } catch (SQLException passed) {
             assertThat(passed.getMessage(), containsString("Unique index or primary key violation"));
             assertThat(passed.getMessage(), containsString("PUBLIC.MATERIALS(FINGERPRINT)"));
         }

@@ -27,7 +27,6 @@ import static org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode
  */
 public class MaterialUpdateMessage implements GoMessage {
     private final Material material;
-
     private long trackingId;
 
     public MaterialUpdateMessage(Material material, long trackingId) {

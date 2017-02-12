@@ -28,7 +28,7 @@ import com.thoughtworks.go.domain.StageArtifactCleanupProhibited;
 import com.thoughtworks.go.server.transaction.TransactionTemplate;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -55,7 +55,7 @@ public class ConfigDbStateRepository extends HibernateDaoSupport {
     }
 
     private Object flushArtifactCleanupProhibitions() {
-        List<StageArtifactCleanupProhibited> existingEntries = getHibernateTemplate().find("from StageArtifactCleanupProhibited");
+        List<StageArtifactCleanupProhibited> existingEntries = (List<StageArtifactCleanupProhibited>) getHibernateTemplate().find("from StageArtifactCleanupProhibited");
         HashMap<Map.Entry<String, String>, StageArtifactCleanupProhibited> persistentStateMap = new HashMap<>();
         for (StageArtifactCleanupProhibited persistentState : existingEntries) {
             persistentState.setProhibited(false);

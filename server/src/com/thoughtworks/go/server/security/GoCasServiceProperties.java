@@ -18,9 +18,9 @@ package com.thoughtworks.go.server.security;
 
 import com.thoughtworks.go.server.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.ui.cas.ServiceProperties;
+import org.springframework.security.cas.ServiceProperties;
 
-public class GoCasServiceProperties extends ServiceProperties{
+public class GoCasServiceProperties extends ServiceProperties {
     private final SecurityService securityService;
     private final String casCallbackPath;
 
@@ -28,26 +28,20 @@ public class GoCasServiceProperties extends ServiceProperties{
     public GoCasServiceProperties(SecurityService securityService, String casCallbackPath) {
         this.securityService = securityService;
         this.casCallbackPath = casCallbackPath;
+        setSendRenew(false);
     }
 
     public void initialize() throws Exception {
-        setService(getService());
+        setService(service());
         super.afterPropertiesSet();
+    }
+
+    private String service() {
+        return String.format("%s/go%s", securityService.casServiceBaseUrl(), casCallbackPath);
     }
 
     //  Service is not set when afterPropertiesSet is invoked, hence overriding it.
     @Override
     public void afterPropertiesSet() throws Exception {
     }
-
-    @Override
-    public String getService() {
-        return String.format("%s/go%s", securityService.casServiceBaseUrl(), casCallbackPath);
-    }
-
-    @Override
-    public boolean isSendRenew() {
-        return false;
-    }
-
 }

@@ -16,22 +16,20 @@
 
 package com.thoughtworks.go.server.security;
 
-import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-
 import com.thoughtworks.go.config.CruiseConfig;
 import com.thoughtworks.go.config.SecurityConfig;
-import com.thoughtworks.go.server.service.GoConfigService;
 import com.thoughtworks.go.listener.ConfigChangedListener;
+import com.thoughtworks.go.server.service.GoConfigService;
 import com.thoughtworks.go.util.TimeProvider;
 import org.apache.log4j.Logger;
-import org.springframework.security.ui.SpringSecurityFilter;
-import org.springframework.security.ui.FilterChainOrder;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.Authentication;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @understands when a logged in user's authorization needs to be redone to get the new roles.

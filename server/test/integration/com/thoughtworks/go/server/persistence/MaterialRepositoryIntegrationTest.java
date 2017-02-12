@@ -72,8 +72,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionStatus;
@@ -181,7 +181,8 @@ public class MaterialRepositoryIntegrationTest {
         when(mockTemplate.find("FROM Modification WHERE materialId = ? AND id BETWEEN ? AND ? ORDER BY id DESC", new Object[]{10L, -1L, -1L})).thenReturn(modifications);
         MaterialInstance materialInstance = material().createMaterialInstance();
         materialInstance.setId(10);
-        when(mockTemplate.findByCriteria(any(DetachedCriteria.class))).thenReturn(asList(materialInstance));
+        List list = asList(materialInstance);
+        when(mockTemplate.findByCriteria(any(DetachedCriteria.class))).thenReturn(list);
 
         PipelineMaterialRevision pmr = pipelineMaterialRevision();
         List<Modification> actual;
